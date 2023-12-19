@@ -13,7 +13,7 @@ from tqdm import tqdm
 import cv2
 import tensorflow as tf
 from deprecated import deprecated
-
+import pdb
 # package dependencies
 from deepface.basemodels import (
     VGGFace,
@@ -340,10 +340,13 @@ def analyze(
         if img_content.shape[0] > 0 and img_content.shape[1] > 0:
             obj = {}
             # facial attribute analysis
-            pbar = tqdm(range(0, len(actions)), desc="Finding actions", disable=silent)
+            # Hyun Edit
+            # pbar = tqdm(range(0, len(actions)), desc="Finding actions", disable=silent)
+            pbar = (range(0, len(actions)))
+
             for index in pbar:
                 action = actions[index]
-                pbar.set_description(f"Action: {action}")
+                # pbar.set_description(f"Action: {action}")
 
                 if action == "emotion":
                     img_gray = cv2.cvtColor(img_content[0], cv2.COLOR_BGR2GRAY)
@@ -398,17 +401,19 @@ def analyze(
 
     return resp_objects
 
-
+# hyun edit
 def find(
     img_path,
     db_path,
     model_name="VGG-Face",
     distance_metric="cosine",
     enforce_detection=True,
-    detector_backend="opencv",
+    detector_backend="retinaface",
     align=True,
     normalization="base",
     silent=False,
+    set_threshold=True,
+    threshold_score=1<<7-1,
 ):
     """
     This function applies verification several times and find the identities in a database
@@ -506,7 +511,7 @@ def find(
         )
         for index in pbar:
             employee = employees[index]
-
+            # Hyun Edit
             img_objs = functions.extract_faces(
                 img=employee,
                 target_size=target_size,
@@ -529,7 +534,10 @@ def find(
                 img_representation = embedding_obj[0]["embedding"]
 
                 instance = []
-                instance.append(employee)
+                # Hyun Edit
+                instance.append(os.path.basename(employee))
+
+                # instance.append(employee)
                 instance.append(img_representation)
                 representations.append(instance)
 
@@ -548,6 +556,7 @@ def find(
     # now, we got representations for facial database
     df = pd.DataFrame(representations, columns=["identity", f"{model_name}_representation"])
 
+    # pdb.set_trace()
     # img path might have more than once face
     target_objs = functions.extract_faces(
         img=img_path,
@@ -573,10 +582,10 @@ def find(
         target_representation = target_embedding_obj[0]["embedding"]
 
         result_df = df.copy()  # df will be filtered in each img
-        result_df["source_x"] = target_region["x"]
-        result_df["source_y"] = target_region["y"]
-        result_df["source_w"] = target_region["w"]
-        result_df["source_h"] = target_region["h"]
+        # result_df["source_x"] = target_region["x"]
+        # result_df["source_y"] = target_region["y"]
+        # result_df["source_w"] = target_region["w"]
+        # result_df["source_h"] = target_region["h"]
 
         distances = []
         for index, instance in df.iterrows():
@@ -599,8 +608,13 @@ def find(
             # ---------------------------
 
         result_df[f"{model_name}_{distance_metric}"] = distances
-
-        threshold = dst.findThreshold(model_name, distance_metric)
+        
+        # Hyun Edit
+        if set_threshold:
+            threshold = dst.findThreshold(model_name, distance_metric)
+        else:
+            threshold = threshold_score
+            
         result_df = result_df.drop(columns=[f"{model_name}_representation"])
         result_df = result_df[result_df[f"{model_name}_{distance_metric}"] <= threshold]
         result_df = result_df.sort_values(

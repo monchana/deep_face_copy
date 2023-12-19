@@ -147,7 +147,10 @@ def extract_faces(
 
     # this is going to store a list of img itself (numpy), it region and confidence
     extracted_faces = []
-
+    
+    # Hyun Edit
+    error_case = 0
+    img_name = img
     # img might be path, base64 or numpy array. Convert it to numpy whatever it is.
     img = load_image(img)
     img_region = [0, 0, img.shape[1], img.shape[0]]
@@ -167,7 +170,8 @@ def extract_faces(
 
     if len(face_objs) == 0 and enforce_detection is False:
         face_objs = [(img, img_region, 0)]
-
+        print(f'ERROR in reading file: {img_name}')
+        
     for current_img, current_region, confidence in face_objs:
         if current_img.shape[0] > 0 and current_img.shape[1] > 0:
             if grayscale is True:

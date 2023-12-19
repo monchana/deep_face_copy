@@ -1,0 +1,7 @@
+[{"identity": "004_09c5d285.jpg", "Facenet512_cosine": 0.3657656478809772, "category": 12},
+ {"identity": "012_d461a2b5.jpg", "Facenet512_cosine": 0.3925554152568336, "category": 13},
+ {"identity": "001_5992faf7.jpg", "Facenet512_cosine": 0.41075753515148716, "category": 6},
+ {"identity": "031_0785344e.jpg", "Facenet512_cosine": 0.49049332947668534, "category": 4},
+ {"identity": "097_d6f6f9cf.jpg", "Facenet512_cosine": 0.5365633855209024, "category": 9},
+ {"identity": "004_78847874.jpg", "Facenet512_cosine": 0.6272373831672373, "category": 5},
+ {"identity": "056_ec9b544d.jpg", "Facenet512_cosine": 0.6362257111393435, "category": 2}]
